@@ -568,6 +568,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d494e38ca02bcd14fb2931963bcbb10d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
 --- !u!1 &1877527478
 GameObject:
   m_ObjectHideFlags: 0
@@ -671,7 +673,6 @@ MonoBehaviour:
   playerSpawnMethod: 0
   spawnPrefabs:
   - {fileID: 2739418477926661920, guid: 483611e3aa220af469fcc9fcd6e0442f, type: 3}
-  - {fileID: 1026025749510913493, guid: 52514c983b07ae34fb293297745d46d6, type: 3}
   - {fileID: 866731099873630360, guid: d7a22f30ce2499e44bb3b0a70a14bbdb, type: 3}
   - {fileID: 5330867893693965158, guid: 67e8c38ffbf4bb9489d102ab8e2c6df8, type: 3}
   - {fileID: 5263168869182066132, guid: 2f9e3870a2be2b340a8a0a0d6ee7ae17, type: 3}

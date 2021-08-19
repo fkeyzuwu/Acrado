@@ -20,9 +20,11 @@ public class CardDisplay : NetworkBehaviour
 
     public void InitializeCard()
     {
+        gameObject.name = card.name;
+
         nameText.text = card.name;
         descriptionText.text = card.description;
-        image.sprite = card.sprite;
+        //image.sprite = card.sprite;
         manaText.text = card.manaCost.ToString();
         attackText.text = card.attack.ToString();
         healthText.text = card.health.ToString();
@@ -32,5 +34,10 @@ public class CardDisplay : NetworkBehaviour
     {
         get { return card; }
         set { card = value; }
+    }
+
+    public void PrintCard()
+    {
+        Debug.Log(card.name);
     }
 }

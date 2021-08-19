@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 
-public class CardFlipper : MonoBehaviour
+public class CardFlipper : NetworkBehaviour
 {
     [SerializeField] private Sprite cardFront;
     [SerializeField] private Sprite cardBack;

@@ -6,6 +6,7 @@ using System;
 
 public class PlayerManager : NetworkBehaviour
 {
+    private readonly string path = "Prefabs\\Cards\\ScriptableCards\\";
     [SerializeField] private GameObject playerDeckPrefab;
     [SerializeField] private GameObject cardPrefab;
 
@@ -50,58 +51,60 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [Command]
-    public void CmdDealCards(int amount)
+    public void CmdDealCards(int amount, bool isSenderServer)
     {
         NetworkIdentity networkIdentity = NetworkClient.connection.identity;
         PlayerManager playerManager = networkIdentity.GetComponent<PlayerManager>();
 
-        Deck deck;
+        //Deck deck = isSenderServer ? playerManager.player1Deck : playerManager.player2Deck;
+        Deck deck = playerManager.player1Deck;
 
-        if (isServer)
+        if(deck.CardDeck.Count >= amount)
         {
-            deck = playerManager.player1Deck;
+            for (int i = 0; i < amount; i++)
+            {
+                GameObject cardObject = Instantiate(cardPrefab, playerArea.transform);
+                NetworkServer.Spawn(cardObject, connectionToClient);
+                RpcShowCard(cardObject, deck.CardDeck.Pop(), "Dealt");
+            }
         }
         else
         {
-            deck = playerManager.player2Deck;
-        }
-
-        for (int i = 0; i < amount; i++)
-        {
-            GameObject card = Instantiate(cardPrefab, playerArea.transform);
-            CardDisplay cardDisplay = card.GetComponent<CardDisplay>();
-            cardDisplay.Card = deck.CardDeck.Pop();
-            cardDisplay.InitializeCard();
-            NetworkServer.Spawn(card, connectionToClient);
-            RpcShowCard(card, "Dealt");
+            Debug.Log($"Cards in {deck} ran out");
         }
     }
 
     [ClientRpc]
-    private void RpcShowCard(GameObject card, string type)
+    private void RpcShowCard(GameObject cardObject, Card card, string type)
     {
         if(type == "Dealt")
         {
             if (hasAuthority)
             {
-                card.transform.SetParent(playerArea.transform, false);
+                cardObject.transform.SetParent(playerArea.transform, false);
+                CardDisplay cardDisplay = cardObject.GetComponent<CardDisplay>();
+                cardDisplay.Card = card;
+                cardDisplay.InitializeCard();
             }
             else
             {
-                card.transform.SetParent(enemyArea.transform, false);
-                card.GetComponent<CardFlipper>().Flip();
+                cardObject.transform.SetParent(enemyArea.transform, false);
+                cardObject.GetComponent<CardFlipper>().Flip();
             }
         }
         else if(type == "Played")
         {
             if (hasAuthority)
             {
-                card.transform.SetParent(playerDropZone.transform, false);
+                cardObject.transform.SetParent(playerDropZone.transform, false);
             }
             else 
             {
-                card.transform.SetParent(enemyDropZone.transform, false);
-                card.GetComponent<CardFlipper>().Flip();
+                cardObject.transform.SetParent(enemyDropZone.transform, false);
+                CardDisplay cardDisplay = cardObject.GetComponent<CardDisplay>();
+                cardDisplay.Card = card;
+                cardDisplay.InitializeCard();
+                cardObject.GetComponent<CardFlipper>().Flip();
             }
         }
     }
@@ -114,6 +117,6 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     private void CmdPlayCard(GameObject card)
     {
-        RpcShowCard(card, "Played");
+        RpcShowCard(card, card.GetComponent<CardDisplay>().Card, "Played");
     }
 }

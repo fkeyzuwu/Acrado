@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class DrawCards : MonoBehaviour
+public class DrawCards : NetworkBehaviour
 {
     private Transform playerArea;
     private PlayerManager playerManager;
@@ -19,7 +19,7 @@ public class DrawCards : MonoBehaviour
         {
             NetworkIdentity networkIdentity = NetworkClient.connection.identity;
             playerManager = networkIdentity.GetComponent<PlayerManager>();
-            playerManager.CmdDealCards(1);
+            playerManager.CmdDealCards(1, isServer);
         }
     }
 }
