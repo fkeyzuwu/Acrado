@@ -25,20 +25,19 @@ public class PlayerManager : NetworkBehaviour
         playerDropZone = GameObject.Find("Player Drop Zone");
         enemyArea = GameObject.Find("Enemy Area");
         enemyDropZone = GameObject.Find("Enemy Drop Zone");
-
-        CmdCreatePlayerDeck(NetworkClient.connection.identity); //TODO: FIX IDK
     }
 
     [Server]
     public override void OnStartServer()
     {
         base.OnStartServer();
+        CmdCreatePlayerDeck();
     }
 
-    [Command]
-    public void CmdCreatePlayerDeck(NetworkIdentity networkIdentity)
+    [Server]
+    public void CmdCreatePlayerDeck()
     {
-        if (networkIdentity.isServer)
+        if (NetworkServer.connections.Count < 2)
         {
             GameObject deckGameObject = Instantiate(playerDeckPrefab);
             player1Deck = deckGameObject.GetComponent<Deck>();
@@ -53,7 +52,19 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdDealCards(int amount)
     {
-        Deck deck = isServer ? player1Deck : player2Deck;
+        NetworkIdentity networkIdentity = NetworkClient.connection.identity;
+        PlayerManager playerManager = networkIdentity.GetComponent<PlayerManager>();
+
+        Deck deck;
+
+        if (isServer)
+        {
+            deck = playerManager.player1Deck;
+        }
+        else
+        {
+            deck = playerManager.player2Deck;
+        }
 
         for (int i = 0; i < amount; i++)
         {
